@@ -7,6 +7,6 @@ For Data Exchange with Ethernet/IP Devices
 - Object Library with CIP-Definined Objects
 - Provides a simple way to access Ethernet/IP Devices without special knowledge about Ethernet/IP
 
-<a href="http://www.de.re.eeip-library.de">Implementation Guide and documentation</a>
+<a href="http://www.eeip-library.de">Implementation Guide and documentation</a>
 
-<a href="https://sourceforge.net/projects/de.re.eeip-java/files/latest/download" rel="nofollow"><img alt="Download EEIP.Java" src="https://a.fsdn.com/con/app/sf-download-button"></a>
+<a href="https://sourceforge.net/projects/eeip-java/files/latest/download" rel="nofollow"><img alt="Download EEIP.Java" src="https://a.fsdn.com/con/app/sf-download-button"></a>
