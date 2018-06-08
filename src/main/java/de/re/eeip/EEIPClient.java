@@ -326,43 +326,52 @@ public class EEIPClient {
         commonPacketFormat.AddressItem = 0x0000;        //NULL (used for UCMM Messages)
         commonPacketFormat.AddressLength = 0x0000;
 
-        commonPacketFormat.DataItem = 0xB2;
-        commonPacketFormat.DataLength = 6;
+        commonPacketFormat.DataItem = 0xB2;//Unconnected message
 
         //----------------CIP Command "Get Attribute Single"
         commonPacketFormat.Data.add((byte) CIPCommonServicesEnum.Get_Attributes_All.getValue());
         //----------------CIP Command "Get Attribute Single"
 
-        //----------------Requested Path size
-        commonPacketFormat.Data.add((byte) 2);
-        //----------------Requested Path size
-
         //----------------Path segment for Class ID
         switch (Tool.smallestFormat(classID)) {
             case Bits_8:
-                commonPacketFormat.Data.add((byte) 0x20);
+                //----------------Requested Path size
+                commonPacketFormat.Data.add((byte) 2);
+                //----------------Requested Path size
+                commonPacketFormat.Data.add(Tool.segmentType(Tool.Format.Bits_8));
                 commonPacketFormat.Data.add((byte) classID);
                 break;
             case Bits_16:
+                //----------------Requested Path size
+                commonPacketFormat.Data.add((byte) 3);
+                //----------------Requested Path size
                 commonPacketFormat.Data.add(Tool.segmentType(Tool.Format.Bits_16));
                 commonPacketFormat.Data.add((byte) 0x00);//padding
-                commonPacketFormat.Data.add((byte) classID & 0xFF);
-                commonPacketFormat.Data.add((byte) classID >> 2 & 0xFF);
+                commonPacketFormat.Data.add((byte) classID);
+                commonPacketFormat.Data.add((byte) (classID >> 8));
+
+                encapsulation.Length += 2;
+                break;
             case Bits_32:
+                //----------------Requested Path size
+                commonPacketFormat.Data.add((byte) 5);
+                //----------------Requested Path size
                 commonPacketFormat.Data.add(Tool.segmentType(Tool.Format.Bits_32));
                 commonPacketFormat.Data.add((byte) 0x00);//padding
                 commonPacketFormat.Data.add((byte) classID & 0xFF);
-                commonPacketFormat.Data.add((byte) classID >> 2 & 0xFF);
-                commonPacketFormat.Data.add((byte) classID >> 4 & 0xFF);
-                commonPacketFormat.Data.add((byte) classID >> 6 & 0xFF);
+                commonPacketFormat.Data.add((byte) classID >> 8 & 0xFF);
+                commonPacketFormat.Data.add((byte) classID >> 16 & 0xFF);
+                commonPacketFormat.Data.add((byte) classID >> 24 & 0xFF);
+                encapsulation.Length += 4;
                 break;
         }
-        //----------------Path segment for Class ID
-
         //----------------Path segment for Instance ID
         commonPacketFormat.Data.add((byte) 0x24);
         commonPacketFormat.Data.add((byte) instanceID);
         //----------------Path segment for Instace ID
+
+        commonPacketFormat.DataLength = commonPacketFormat.Data.size();
+
         byte[] dataToWrite = new byte[encapsulation.toBytes().length + commonPacketFormat.toBytes().length];
         System.arraycopy(encapsulation.toBytes(), 0, dataToWrite, 0, encapsulation.toBytes().length);
         System.arraycopy(commonPacketFormat.toBytes(), 0, dataToWrite, encapsulation.toBytes().length, commonPacketFormat.toBytes().length);
@@ -415,37 +424,43 @@ public class EEIPClient {
         commonPacketFormat.DataItem = 0xB2;
         commonPacketFormat.DataLength = (8 + value.length);
 
-
         //----------------CIP Command "Set Attribute Single"
         commonPacketFormat.Data.add((byte) CIPCommonServicesEnum.Set_Attribute_Single.getValue());
         //----------------CIP Command "Set Attribute Single"
 
-        //----------------Requested Path size
-        commonPacketFormat.Data.add((byte) 3);
-        //----------------Requested Path size
-
         //----------------Path segment for Class ID
         switch (Tool.smallestFormat(classID)) {
             case Bits_8:
-                commonPacketFormat.Data.add((byte) 0x20);
+                //----------------Requested Path size
+                commonPacketFormat.Data.add((byte) 3);
+                //----------------Requested Path size
+                commonPacketFormat.Data.add(Tool.segmentType(Tool.Format.Bits_8));
                 commonPacketFormat.Data.add((byte) classID);
                 break;
             case Bits_16:
+                //----------------Requested Path size
+                commonPacketFormat.Data.add((byte) 4);
+                //----------------Requested Path size
                 commonPacketFormat.Data.add(Tool.segmentType(Tool.Format.Bits_16));
                 commonPacketFormat.Data.add((byte) 0x00);//padding
-                commonPacketFormat.Data.add((byte) classID & 0xFF);
-                commonPacketFormat.Data.add((byte) classID >> 2 & 0xFF);
+                commonPacketFormat.Data.add((byte) classID);
+                commonPacketFormat.Data.add((byte) (classID >> 8));
+
+                encapsulation.Length += 2;
+                break;
             case Bits_32:
+                //----------------Requested Path size
+                commonPacketFormat.Data.add((byte) 6);
+                //----------------Requested Path size
                 commonPacketFormat.Data.add(Tool.segmentType(Tool.Format.Bits_32));
                 commonPacketFormat.Data.add((byte) 0x00);//padding
                 commonPacketFormat.Data.add((byte) classID & 0xFF);
-                commonPacketFormat.Data.add((byte) classID >> 2 & 0xFF);
-                commonPacketFormat.Data.add((byte) classID >> 4 & 0xFF);
-                commonPacketFormat.Data.add((byte) classID >> 6 & 0xFF);
+                commonPacketFormat.Data.add((byte) classID >> 8 & 0xFF);
+                commonPacketFormat.Data.add((byte) classID >> 16 & 0xFF);
+                commonPacketFormat.Data.add((byte) classID >> 24 & 0xFF);
+                encapsulation.Length += 4;
                 break;
         }
-
-        //----------------Path segment for Class ID
 
         //----------------Path segment for Instance ID
         commonPacketFormat.Data.add((byte) 0x24);
