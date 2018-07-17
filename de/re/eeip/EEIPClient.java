@@ -1,7 +1,5 @@
 package de.re.eeip;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.ListenerThread;
 import de.re.eeip.cip.datatypes.CIPCommonServicesEnum;
 import de.re.eeip.cip.datatypes.ConnectionType;
 import de.re.eeip.cip.datatypes.RealTimeFormat;
@@ -10,18 +8,9 @@ import de.re.eeip.discoverdevices.DiscoverDevices;
 import de.re.eeip.encapsulation.CipIdentityItem;
 import de.re.eeip.encapsulation.datatypes.CommandsEnum;
 
-import java.io.*;
-import java.net.*;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousServerSocketChannel;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
-import java.nio.channels.MulticastChannel;
-import java.nio.charset.Charset;
 import java.util.List;
 
 
@@ -179,14 +168,18 @@ public class EEIPClient
         de.re.eeip.encapsulation.Encapsulation encapsulation = new de.re.eeip.encapsulation.Encapsulation();
         encapsulation.Command = CommandsEnum.UnRegisterSession;
         encapsulation.Length = 0;
-        encapsulation.SessionHandle =  sessionHandle;
-        outToServer.write(encapsulation.toBytes());
+        encapsulation.SessionHandle = sessionHandle;
+        try {
+            outToServer.write(encapsulation.toBytes());
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            clientSocket.close();
+            outToServer.close();
+            inFromServer.close();
 
-        clientSocket.close();
-        outToServer.close();
-        inFromServer.close();
-
-        sessionHandle = 0;
+            sessionHandle = 0;
+        }
     }
 
     /**
