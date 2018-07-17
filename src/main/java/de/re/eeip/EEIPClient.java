@@ -174,13 +174,30 @@ public class EEIPClient {
         encapsulation.Command = CommandsEnum.UnRegisterSession;
         encapsulation.Length = 0;
         encapsulation.SessionHandle = sessionHandle;
-        outToServer.write(encapsulation.toBytes());
+        try {
+            outToServer.write(encapsulation.toBytes());
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            clientSocket.close();
+            outToServer.close();
+            inFromServer.close();
 
-        clientSocket.close();
-        outToServer.close();
-        inFromServer.close();
+            sessionHandle = 0;
+        }
+    }
 
-        sessionHandle = 0;
+    /**
+     * Send a UnRegisterSession command to a target to terminate session, and set var to unconnect , and then connect again
+     */
+    public void ReconnectSession() throws IOException {
+        try {
+            UnRegisterSession();
+        } catch (Exception e) {
+            // do nonthing
+        } finally {
+            RegisterSession();
+        }
     }
 
     /**
